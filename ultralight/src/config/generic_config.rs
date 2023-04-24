@@ -1,5 +1,6 @@
 use std::{
     fmt::{self, Debug, Formatter},
+    sync::Mutex,
     time::Duration,
 };
 
@@ -7,7 +8,13 @@ use ultralight_sys::*;
 
 use crate::{string::UString, AsULRawPtr};
 
-pub struct Config(ULConfig);
+macro_rules! lock_in_scope {
+    ($mutex:expr) => {
+        let _guard = $mutex.lock().unwrap();
+    };
+}
+
+pub struct Config(ULConfig, Mutex<()>);
 
 // SAFETY: ultralight can only run on systems, that c_int = i32.
 #[allow(clippy::unnecessary_cast)]
@@ -48,6 +55,7 @@ impl Config {
     ///
     /// Files are only written to disk when using a persistent Session.
     pub fn set_cache_path(&mut self, cache_path: &str) {
+        lock_in_scope!(self.1);
         let s = UString::from(cache_path);
         unsafe { ulConfigSetCachePath(self.0, s.as_raw_ptr()) }
     }
@@ -58,6 +66,7 @@ impl Config {
     ///
     /// (Default = "resources/")
     pub fn set_resource_path_prefix(&mut self, resource_path_prefix: &str) {
+        lock_in_scope!(self.1);
         let s = UString::from(resource_path_prefix);
         unsafe { ulConfigSetResourcePathPrefix(self.0, s.as_raw_ptr()) }
     }
@@ -68,6 +77,7 @@ impl Config {
     ///
     /// (Default = kFaceWinding_CounterClockwise)
     pub fn set_face_winding(&mut self, winding: FaceWinding) {
+        lock_in_scope!(self.1);
         unsafe { ulConfigSetFaceWinding(self.0, winding as _) }
     }
 
@@ -75,6 +85,7 @@ impl Config {
     ///
     /// (Default = [`FontHinting::Normal`])
     pub fn set_font_hinting(&mut self, font_hinting: FontHinting) {
+        lock_in_scope!(self.1);
         unsafe { ulConfigSetFontHinting(self.0, font_hinting as _) }
     }
 
@@ -83,6 +94,7 @@ impl Config {
     ///
     /// (Default = 1.8)
     pub fn set_font_gamma(&mut self, font_gamma: f64) {
+        lock_in_scope!(self.1);
         unsafe { ulConfigSetFontGamma(self.0, font_gamma) }
     }
 
@@ -90,6 +102,7 @@ impl Config {
     ///
     /// (Default = Empty)
     pub fn set_user_stylesheet(&mut self, css_string: &str) {
+        lock_in_scope!(self.1);
         let s = UString::from(css_string);
         unsafe { ulConfigSetUserStylesheet(self.0, s.as_raw_ptr()) }
     }
@@ -100,6 +113,7 @@ impl Config {
     ///
     /// (Default = [`false`])
     pub fn set_force_repaint(&mut self, enabled: bool) {
+        lock_in_scope!(self.1);
         unsafe { ulConfigSetForceRepaint(self.0, enabled) }
     }
 
@@ -108,6 +122,7 @@ impl Config {
     ///
     /// (Default = 1.0 / 60.0)
     pub fn set_animation_timer_delay(&mut self, delay: Duration) {
+        lock_in_scope!(self.1);
         unsafe { ulConfigSetAnimationTimerDelay(self.0, delay.as_secs_f64()) }
     }
 
@@ -116,6 +131,7 @@ impl Config {
     ///
     /// (Default is 60 Hz)
     pub fn set_scroll_timer_delay(&mut self, delay: Duration) {
+        lock_in_scope!(self.1);
         unsafe { ulConfigSetScrollTimerDelay(self.0, delay.as_secs_f64()) }
     }
 
@@ -124,6 +140,7 @@ impl Config {
     ///
     /// (Default = 4.0)
     pub fn set_recycle_delay(&mut self, delay: Duration) {
+        lock_in_scope!(self.1);
         unsafe { ulConfigSetRecycleDelay(self.0, delay.as_secs_f64()) }
     }
 
@@ -131,6 +148,7 @@ impl Config {
     ///
     /// (Default = 64 * 1024 * 1024)
     pub fn set_memory_cache_size(&mut self, size: u32) {
+        lock_in_scope!(self.1);
         unsafe { ulConfigSetMemoryCacheSize(self.0, size) }
     }
 
@@ -138,6 +156,7 @@ impl Config {
     ///
     /// (Default = 0)
     pub fn set_page_cache_size(&mut self, size: u32) {
+        lock_in_scope!(self.1);
         unsafe { ulConfigSetPageCacheSize(self.0, size) }
     }
 
@@ -148,6 +167,7 @@ impl Config {
     ///
     /// (Default = 0)
     pub fn set_override_ram_size(&mut self, size: u32) {
+        lock_in_scope!(self.1);
         unsafe { ulConfigSetOverrideRAMSize(self.0, size) }
     }
 
@@ -156,6 +176,7 @@ impl Config {
     ///
     /// (Default = 32 * 1024 * 1024)
     pub fn set_min_large_heap_size(&mut self, size: u32) {
+        lock_in_scope!(self.1);
         unsafe { ulConfigSetMinLargeHeapSize(self.0, size) }
     }
 
@@ -164,6 +185,7 @@ impl Config {
     ///
     /// (Default = 1 * 1024 * 1024)
     pub fn set_min_small_heap_size(&mut self, size: u32) {
+        lock_in_scope!(self.1);
         unsafe { ulConfigSetMinSmallHeapSize(self.0, size) }
     }
 
@@ -175,6 +197,7 @@ impl Config {
     /// using the following formula:
     ///        max(PhysicalProcessorCount() - 1, 1)
     pub fn set_num_renderer_threads(&mut self, num_renderer_threads: u32) {
+        lock_in_scope!(self.1);
         unsafe { ulConfigSetNumRendererThreads(self.0, num_renderer_threads) }
     }
 
@@ -183,6 +206,7 @@ impl Config {
     ///
     /// (Default = 0.005)
     pub fn set_max_update_time(&mut self, max_update_time: Duration) {
+        lock_in_scope!(self.1);
         unsafe { ulConfigSetMaxUpdateTime(self.0, max_update_time.as_secs_f64()) }
     }
 
@@ -202,6 +226,7 @@ impl Config {
     ///
     /// (Default = 16)
     pub fn set_cpu_bitmap_surface_alignment(&mut self, alignment: f64) {
+        lock_in_scope!(self.1);
         unsafe { ulConfigSetBitmapAlignment(self.0, alignment) }
     }
 }
@@ -226,6 +251,9 @@ impl Debug for Config {
 
 impl Default for Config {
     fn default() -> Self {
-        Self(unsafe { ulCreateConfig() })
+        Self(unsafe { ulCreateConfig() }, Mutex::new(()))
     }
 }
+
+unsafe impl Send for Config {}
+unsafe impl Sync for Config {}

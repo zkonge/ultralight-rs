@@ -1,10 +1,19 @@
-use std::fmt::{self, Debug, Formatter};
+use std::{
+    fmt::{self, Debug, Formatter},
+    sync::Mutex,
+};
 
 use ultralight_sys::*;
 
 use crate::{string::UString, AsULRawPtr};
 
-pub struct ViewConfig(ULViewConfig);
+macro_rules! lock_in_scope {
+    ($mutex:expr) => {
+        let _guard = $mutex.lock().unwrap();
+    };
+}
+
+pub struct ViewConfig(ULViewConfig, Mutex<()>);
 
 impl ViewConfig {
     /// Whether to render using the GPU renderer (accelerated) or the CPU renderer (un-accelerated).
@@ -20,6 +29,7 @@ impl ViewConfig {
     ///
     /// for more info see ulViewGetSurface().
     pub fn set_is_accelerated(&mut self, is_accelerated: bool) {
+        lock_in_scope!(self.1);
         unsafe { ulViewConfigSetIsAccelerated(self.0, is_accelerated) }
     }
 
@@ -27,6 +37,7 @@ impl ViewConfig {
     ///
     /// (Default = True)
     pub fn set_is_transparent(&mut self, is_transparent: bool) {
+        lock_in_scope!(self.1);
         unsafe { ulViewConfigSetIsTransparent(self.0, is_transparent) }
     }
 
@@ -37,6 +48,7 @@ impl ViewConfig {
     ///
     /// (Default = 1.0)
     pub fn set_initial_device_scale(&mut self, initial_device_scale: f64) {
+        lock_in_scope!(self.1);
         unsafe { ulViewConfigSetInitialDeviceScale(self.0, initial_device_scale) }
     }
 
@@ -44,6 +56,7 @@ impl ViewConfig {
     ///
     /// (Default = [`true`])
     pub fn set_initial_focus(&mut self, is_focused: bool) {
+        lock_in_scope!(self.1);
         unsafe { ulViewConfigSetInitialFocus(self.0, is_focused) }
     }
 
@@ -51,6 +64,7 @@ impl ViewConfig {
     ///
     /// (Default = True)
     pub fn set_enable_images(&mut self, enabled: bool) {
+        lock_in_scope!(self.1);
         unsafe { ulViewConfigSetEnableImages(self.0, enabled) }
     }
 
@@ -58,6 +72,7 @@ impl ViewConfig {
     ///
     /// (Default = True)
     pub fn set_enable_javascript(&mut self, enabled: bool) {
+        lock_in_scope!(self.1);
         unsafe { ulViewConfigSetEnableJavaScript(self.0, enabled) }
     }
 
@@ -65,6 +80,7 @@ impl ViewConfig {
     ///
     /// (Default = Times New Roman)
     pub fn set_font_family_standard(&mut self, font_name: &str) {
+        lock_in_scope!(self.1);
         let s = UString::from(font_name);
         unsafe { ulViewConfigSetFontFamilyStandard(self.0, s.as_raw_ptr()) }
     }
@@ -73,6 +89,7 @@ impl ViewConfig {
     ///
     /// (Default = Courier New)
     pub fn set_font_family_fixed(&mut self, font_name: &str) {
+        lock_in_scope!(self.1);
         let s = UString::from(font_name);
         unsafe { ulViewConfigSetFontFamilyFixed(self.0, s.as_raw_ptr()) }
     }
@@ -81,6 +98,7 @@ impl ViewConfig {
     ///
     /// (Default = Times New Roman)
     pub fn set_font_family_serif(&mut self, font_name: &str) {
+        lock_in_scope!(self.1);
         let s = UString::from(font_name);
         unsafe { ulViewConfigSetFontFamilySerif(self.0, s.as_raw_ptr()) }
     }
@@ -89,6 +107,7 @@ impl ViewConfig {
     ///
     /// (Default = Arial)
     pub fn set_font_family_sans_serif(&mut self, font_name: &str) {
+        lock_in_scope!(self.1);
         let s = UString::from(font_name);
         unsafe { ulViewConfigSetFontFamilySansSerif(self.0, s.as_raw_ptr()) }
     }
@@ -97,6 +116,7 @@ impl ViewConfig {
     ///
     /// (See <Ultralight/platform/Config.h> for the default)
     pub fn set_user_agent(&mut self, agent_string: &str) {
+        lock_in_scope!(self.1);
         let s = UString::from(agent_string);
         unsafe { ulViewConfigSetUserAgent(self.0, s.as_raw_ptr()) }
     }
@@ -110,6 +130,7 @@ impl AsULRawPtr<ULViewConfig> for ViewConfig {
 
 impl Drop for ViewConfig {
     fn drop(&mut self) {
+        lock_in_scope!(self.1);
         unsafe { ulDestroyViewConfig(self.0) }
     }
 }
@@ -122,6 +143,9 @@ impl Debug for ViewConfig {
 
 impl Default for ViewConfig {
     fn default() -> Self {
-        Self(unsafe { ulCreateViewConfig() })
+        Self(unsafe { ulCreateViewConfig() }, Mutex::new(()))
     }
 }
+
+unsafe impl Send for ViewConfig {}
+unsafe impl Sync for ViewConfig {}
