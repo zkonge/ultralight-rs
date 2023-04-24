@@ -16,6 +16,24 @@ macro_rules! unreachable_fail {
     };
 }
 
+macro_rules! load_file_system {
+    ($file_system:ident) => {
+        let guard = match USER_FILE_SYSTEM.read() {
+            Ok(guard) => guard,
+            Err(_) => {
+                lock_fail!();
+            }
+        };
+
+        let $file_system = match guard.as_ref() {
+            Some(file_system) => file_system,
+            None => {
+                unreachable_fail!();
+            }
+        };
+    };
+}
+
 static USER_FILE_SYSTEM: RwLock<Option<Box<dyn FileSystem>>> = RwLock::new(None);
 static FILE_SYSTEM: ULFileSystem = ULFileSystem {
     file_exists: Some(file_exists_callback),
@@ -25,19 +43,7 @@ static FILE_SYSTEM: ULFileSystem = ULFileSystem {
 };
 
 unsafe extern "C" fn file_exists_callback(path: ULString) -> bool {
-    let guard = match USER_FILE_SYSTEM.read() {
-        Ok(guard) => guard,
-        Err(_) => {
-            lock_fail!();
-        }
-    };
-
-    let file_system = match guard.as_ref() {
-        Some(file_system) => file_system,
-        None => {
-            unreachable_fail!();
-        }
-    };
+    load_file_system!(file_system);
 
     let path = ManuallyDrop::new(UString::from_raw(path));
     let path = Path::new(path.deref().deref());
@@ -46,19 +52,7 @@ unsafe extern "C" fn file_exists_callback(path: ULString) -> bool {
 }
 
 unsafe extern "C" fn get_file_mime_type_callback(path: ULString) -> ULString {
-    let guard = match USER_FILE_SYSTEM.read() {
-        Ok(guard) => guard,
-        Err(_) => {
-            lock_fail!();
-        }
-    };
-
-    let file_system = match guard.as_ref() {
-        Some(file_system) => file_system,
-        None => {
-            unreachable_fail!();
-        }
-    };
+    load_file_system!(file_system);
 
     let path = ManuallyDrop::new(UString::from_raw(path));
     let path = Path::new(path.deref().deref());
@@ -67,19 +61,7 @@ unsafe extern "C" fn get_file_mime_type_callback(path: ULString) -> ULString {
 }
 
 unsafe extern "C" fn get_file_charset_callback(path: ULString) -> ULString {
-    let guard = match USER_FILE_SYSTEM.read() {
-        Ok(guard) => guard,
-        Err(_) => {
-            lock_fail!();
-        }
-    };
-
-    let file_system = match guard.as_ref() {
-        Some(file_system) => file_system,
-        None => {
-            unreachable_fail!();
-        }
-    };
+    load_file_system!(file_system);
 
     let path = ManuallyDrop::new(UString::from_raw(path));
     let path = Path::new(path.deref().deref());
@@ -88,19 +70,7 @@ unsafe extern "C" fn get_file_charset_callback(path: ULString) -> ULString {
 }
 
 unsafe extern "C" fn open_file_callback(path: ULString) -> ULBuffer {
-    let guard = match USER_FILE_SYSTEM.read() {
-        Ok(guard) => guard,
-        Err(_) => {
-            lock_fail!();
-        }
-    };
-
-    let file_system = match guard.as_ref() {
-        Some(file_system) => file_system,
-        None => {
-            unreachable_fail!();
-        }
-    };
+    load_file_system!(file_system);
 
     let path = ManuallyDrop::new(UString::from_raw(path));
     let path = Path::new(path.deref().deref());
