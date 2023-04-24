@@ -1,4 +1,4 @@
-use std::{cell::UnsafeCell, ffi, marker::PhantomData, mem::ManuallyDrop, rc::Rc};
+use std::{cell::Cell, ffi, marker::PhantomData, mem::ManuallyDrop, rc::Rc};
 
 use ultralight_sys::*;
 
@@ -9,7 +9,7 @@ use crate::{
 pub struct View<'a> {
     view: ULView,
     _session: Rc<Session>,
-    callback_lifetime: PhantomData<UnsafeCell<&'a ()>>,
+    callback_lifetime: PhantomData<Cell<&'a ()>>,
 }
 
 impl<'a> View<'a> {
