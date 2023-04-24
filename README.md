@@ -8,7 +8,7 @@ Focusing on using as a lightweight headless browser
 
 1. Get the `v1.3.0` SDK from [ultralight GitHub Page](https://github.com/ultralight-ux/ultralight#getting-the-latest-sdk)
 2. Set `ULTRALIGHT_SDK_PATH` environment variable to the SDK path
-3. Compile and do not forget to set `LD_LIBRARY_PATH` to the SDK bin path, or copy DLLs to target path on Windows.
+3. Compile and do not forget to set `LD_LIBRARY_PATH` to the SDK bin path, or copy dynamic library to target path (both Linux and Windows).
 
 ## Example
 
@@ -22,4 +22,4 @@ AGPL for now, but I'm considering to change to in the future.
 ### for the ultralight itself
 see [ultralight GitHub Page](https://github.com/ultralight-ux/ultralight#licensing)
 
-NOTICE: Ultralight has a commercial license.
+**NOTICE**: Ultralight has a commercial license.
