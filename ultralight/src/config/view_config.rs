@@ -19,17 +19,15 @@ impl ViewConfig {
     /// multithreaded CPU renderer. This pixel buffer can optionally be provided by the user--
     ///
     /// for more info see ulViewGetSurface().
-    pub fn set_is_accelerated(&mut self, is_accelerated: bool) -> &mut Self {
+    pub fn set_is_accelerated(&mut self, is_accelerated: bool) {
         unsafe { ulViewConfigSetIsAccelerated(self.0, is_accelerated) }
-        self
     }
 
     /// Set whether images should be enabled
     ///
     /// (Default = True)
-    pub fn set_is_transparent(&mut self, is_transparent: bool) -> &mut Self {
+    pub fn set_is_transparent(&mut self, is_transparent: bool) {
         unsafe { ulViewConfigSetIsTransparent(self.0, is_transparent) }
-        self
     }
 
     /// The initial device scale, ie. the amount to scale page units to screen pixels. This should be
@@ -38,78 +36,69 @@ impl ViewConfig {
     /// @note 1.0 is equal to 100% zoom (no scaling), 2.0 is equal to 200% zoom (2x scaling)
     ///
     /// (Default = 1.0)
-    pub fn set_initial_device_scale(&mut self, initial_device_scale: f64) -> &mut Self {
+    pub fn set_initial_device_scale(&mut self, initial_device_scale: f64) {
         unsafe { ulViewConfigSetInitialDeviceScale(self.0, initial_device_scale) }
-        self
     }
 
     /// Whether or not the View should initially have input focus.
     ///
     /// (Default = [`true`])
-    pub fn set_initial_focus(&mut self, is_focused: bool) -> &mut Self {
+    pub fn set_initial_focus(&mut self, is_focused: bool) {
         unsafe { ulViewConfigSetInitialFocus(self.0, is_focused) }
-        self
     }
 
     /// Set whether images should be enabled.
     ///
     /// (Default = True)
-    pub fn set_enable_images(&mut self, enabled: bool) -> &mut Self {
+    pub fn set_enable_images(&mut self, enabled: bool) {
         unsafe { ulViewConfigSetEnableImages(self.0, enabled) }
-        self
     }
 
     /// Set whether JavaScript should be enabled.
     ///
     /// (Default = True)
-    pub fn set_enable_javascript(&mut self, enabled: bool) -> &mut Self {
+    pub fn set_enable_javascript(&mut self, enabled: bool) {
         unsafe { ulViewConfigSetEnableJavaScript(self.0, enabled) }
-        self
     }
 
     /// Set default font-family to use.
     ///
     /// (Default = Times New Roman)
-    pub fn set_font_family_standard(&mut self, font_name: &str) -> &mut Self {
+    pub fn set_font_family_standard(&mut self, font_name: &str) {
         let s = UString::from(font_name);
         unsafe { ulViewConfigSetFontFamilyStandard(self.0, s.as_raw_ptr()) }
-        self
     }
 
     /// Set default font-family to use for fixed fonts, eg <pre> and <code>.
     ///
     /// (Default = Courier New)
-    pub fn set_font_family_fixed(&mut self, font_name: &str) -> &mut Self {
+    pub fn set_font_family_fixed(&mut self, font_name: &str) {
         let s = UString::from(font_name);
         unsafe { ulViewConfigSetFontFamilyFixed(self.0, s.as_raw_ptr()) }
-        self
     }
 
     /// Set default font-family to use for serif fonts.
     ///
     /// (Default = Times New Roman)
-    pub fn set_font_family_serif(&mut self, font_name: &str) -> &mut Self {
+    pub fn set_font_family_serif(&mut self, font_name: &str) {
         let s = UString::from(font_name);
         unsafe { ulViewConfigSetFontFamilySerif(self.0, s.as_raw_ptr()) }
-        self
     }
 
     /// Set default font-family to use for sans-serif fonts.
     ///
     /// (Default = Arial)
-    pub fn set_font_family_sans_serif(&mut self, font_name: &str) -> &mut Self {
+    pub fn set_font_family_sans_serif(&mut self, font_name: &str) {
         let s = UString::from(font_name);
         unsafe { ulViewConfigSetFontFamilySansSerif(self.0, s.as_raw_ptr()) }
-        self
     }
 
     /// Set user agent string.
     ///
     /// (See <Ultralight/platform/Config.h> for the default)
-    pub fn set_user_agent(&mut self, agent_string: &str) -> &mut Self {
+    pub fn set_user_agent(&mut self, agent_string: &str) {
         let s = UString::from(agent_string);
         unsafe { ulViewConfigSetUserAgent(self.0, s.as_raw_ptr()) }
-        self
     }
 }
 
