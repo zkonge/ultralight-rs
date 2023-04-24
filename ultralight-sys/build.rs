@@ -1,7 +1,7 @@
 use std::{env, path::PathBuf};
 
 fn main() {
-    env::set_var("LIBCLANG_PATH", r"D:\misc\clang\bin");
+    // env::set_var("LIBCLANG_PATH", r"D:\misc\clang\bin");
 
     println!("cargo:rerun-if-changed=./include");
     println!("cargo:rerun-if-changed=build.rs");
