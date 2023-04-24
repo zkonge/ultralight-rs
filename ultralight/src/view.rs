@@ -1,4 +1,4 @@
-use std::{cell::Cell, ffi, marker::PhantomData, mem::ManuallyDrop, rc::Rc};
+use std::{cell::Cell, ffi, marker::PhantomData, mem::ManuallyDrop, ptr::null_mut, rc::Rc};
 
 use ultralight_sys::*;
 
@@ -78,6 +78,50 @@ impl<'a> View<'a> {
         }
     }
 
+    pub fn evaluate_script(&mut self, script: &str) -> Result<String, String> {
+        let script = UString::from(script);
+        let mut exception: ULString = null_mut();
+
+        let result =
+            unsafe { ulViewEvaluateScript(self.view, script.as_raw_ptr(), &mut exception) };
+
+        if exception.is_null() {
+            let result = ManuallyDrop::new(unsafe { UString::from_raw(result) });
+            Ok(result.to_string())
+        } else {
+            let exception = ManuallyDrop::new(unsafe { UString::from_raw(exception) });
+            Err(exception.to_string())
+        }
+    }
+
+    // TODO: impl all callbacks with macro
+    pub fn set_begin_loading_callback<F>(&mut self, callback: &'a F)
+    where
+        F: Fn(ULView, u64, bool, &str),
+    {
+        unsafe extern "C" fn wrapper<F>(
+            user_data: *mut ffi::c_void,
+            caller: ULView,
+            frame_id: ffi::c_ulonglong,
+            is_main_frame: bool,
+            url: ULString,
+        ) where
+            F: Fn(ULView, u64, bool, &str),
+        {
+            let cb = unsafe { &*(user_data as *const F) };
+            let url = ManuallyDrop::new(UString::from_raw(url));
+            cb(caller, frame_id, is_main_frame, &url);
+        }
+
+        unsafe {
+            ulViewSetBeginLoadingCallback(
+                self.view,
+                Some(wrapper::<F>),
+                callback as *const _ as *mut _,
+            );
+        }
+    }
+
     pub fn set_finish_loading_callback<F>(&mut self, callback: &'a F)
     where
         F: Fn(ULView, u64, bool, &str),
@@ -98,6 +142,46 @@ impl<'a> View<'a> {
 
         unsafe {
             ulViewSetFinishLoadingCallback(
+                self.view,
+                Some(wrapper::<F>),
+                callback as *const _ as *mut _,
+            );
+        }
+    }
+
+    pub fn set_fail_loading_callback<F>(&mut self, callback: &'a F)
+    where
+        F: Fn(ULView, u64, bool, &str, &str, &str, i32),
+    {
+        unsafe extern "C" fn wrapper<F>(
+            user_data: *mut ffi::c_void,
+            caller: ULView,
+            frame_id: ffi::c_ulonglong,
+            is_main_frame: bool,
+            url: ULString,
+            description: ULString,
+            error_domain: ULString,
+            error_code: ffi::c_int,
+        ) where
+            F: Fn(ULView, u64, bool, &str, &str, &str, i32),
+        {
+            let cb = unsafe { &*(user_data as *const F) };
+            let url = ManuallyDrop::new(UString::from_raw(url));
+            let description = ManuallyDrop::new(UString::from_raw(description));
+            let error_domain = ManuallyDrop::new(UString::from_raw(error_domain));
+            cb(
+                caller,
+                frame_id,
+                is_main_frame,
+                &url,
+                &description,
+                &error_domain,
+                error_code,
+            );
+        }
+
+        unsafe {
+            ulViewSetFailLoadingCallback(
                 self.view,
                 Some(wrapper::<F>),
                 callback as *const _ as *mut _,

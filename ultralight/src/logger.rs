@@ -44,6 +44,7 @@ unsafe extern "C" fn logger_callback(level: ULLogLevel, message: ULString) {
 pub type UserLogger = fn(LogLevel, &str);
 
 // SAFETY: ultralight can only run on systems, that c_int = i32.
+#[allow(clippy::unnecessary_cast)]
 #[derive(Debug)]
 #[repr(i32)]
 pub enum LogLevel {

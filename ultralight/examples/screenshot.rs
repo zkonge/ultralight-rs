@@ -13,6 +13,7 @@ use ultralight::{
     buffer::Buffer,
     config::{Config, ViewConfig},
     filesystem::{set_platform_file_system, FileSystem},
+    logger::{set_platform_logger, LogLevel},
     platform::enable_platform_font_loader,
     renderer::Renderer,
     surface::{BitmapSurface, Surface},
@@ -116,7 +117,7 @@ fn do_screenshot(
         renderer.update();
         renderer.render();
 
-        if let Ok(_) = rx.try_recv() {
+        if rx.try_recv().is_ok() {
             break;
         }
     }
@@ -147,7 +148,11 @@ fn do_screenshot(
 
 fn main() {
     // Basic setup
-    // set_platform_logger(|level, msg| println!("{level:?} {msg}"));
+    set_platform_logger(|level, msg| {
+        if let LogLevel::Error = level {
+            println!("{level:?} {msg}")
+        };
+    });
     // equals to ulPlatformSetFileSystem
     set_platform_file_system(Box::new(MyFileSystem::new("./".into())));
     enable_platform_font_loader();

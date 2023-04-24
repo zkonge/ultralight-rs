@@ -10,6 +10,7 @@ use crate::{string::UString, AsULRawPtr};
 pub struct Config(ULConfig);
 
 // SAFETY: ultralight can only run on systems, that c_int = i32.
+#[allow(clippy::unnecessary_cast)]
 #[repr(i32)]
 pub enum FaceWinding {
     Clockwise = ULFaceWinding_kFaceWinding_Clockwise as i32,
@@ -17,6 +18,7 @@ pub enum FaceWinding {
 }
 
 // SAFETY: ultralight can only run on systems, that c_int = i32.
+#[allow(clippy::unnecessary_cast)]
 #[repr(i32)]
 pub enum FontHinting {
     /// Lighter hinting algorithm
@@ -45,7 +47,7 @@ impl Config {
     /// cached resources, and other persistent data.
     ///
     /// Files are only written to disk when using a persistent Session.
-    pub fn set_cache_path(&mut self, cache_path: &str){
+    pub fn set_cache_path(&mut self, cache_path: &str) {
         let s = UString::from(cache_path);
         unsafe { ulConfigSetCachePath(self.0, s.as_raw_ptr()) }
     }
@@ -55,7 +57,7 @@ impl Config {
     /// You can customize the prefix to use when loading resource URLs by modifying this setting.
     ///
     /// (Default = "resources/")
-    pub fn set_resource_path_prefix(&mut self, resource_path_prefix: &str){
+    pub fn set_resource_path_prefix(&mut self, resource_path_prefix: &str) {
         let s = UString::from(resource_path_prefix);
         unsafe { ulConfigSetResourcePathPrefix(self.0, s.as_raw_ptr()) }
     }
@@ -65,14 +67,14 @@ impl Config {
     /// Note: This is only used with custom GPUDrivers.
     ///
     /// (Default = kFaceWinding_CounterClockwise)
-    pub fn set_face_winding(&mut self, winding: FaceWinding){
+    pub fn set_face_winding(&mut self, winding: FaceWinding) {
         unsafe { ulConfigSetFaceWinding(self.0, winding as _) }
     }
 
     /// The hinting algorithm to use when rendering fonts. See [`FontHinting`].
     ///
     /// (Default = [`FontHinting::Normal`])
-    pub fn set_font_hinting(&mut self, font_hinting: FontHinting){
+    pub fn set_font_hinting(&mut self, font_hinting: FontHinting) {
         unsafe { ulConfigSetFontHinting(self.0, font_hinting as _) }
     }
 
@@ -80,14 +82,14 @@ impl Config {
     /// (Adobe and Apple prefer 1.8, others may prefer 2.2).
     ///
     /// (Default = 1.8)
-    pub fn set_font_gamma(&mut self, font_gamma: f64){
+    pub fn set_font_gamma(&mut self, font_gamma: f64) {
         unsafe { ulConfigSetFontGamma(self.0, font_gamma) }
     }
 
     /// Set user stylesheet (CSS)
     ///
     /// (Default = Empty)
-    pub fn set_user_stylesheet(&mut self, css_string: &str){
+    pub fn set_user_stylesheet(&mut self, css_string: &str) {
         let s = UString::from(css_string);
         unsafe { ulConfigSetUserStylesheet(self.0, s.as_raw_ptr()) }
     }
@@ -97,7 +99,7 @@ impl Config {
     /// This is mainly used to diagnose painting/shader issues.
     ///
     /// (Default = [`false`])
-    pub fn set_force_repaint(&mut self, enabled: bool){
+    pub fn set_force_repaint(&mut self, enabled: bool) {
         unsafe { ulConfigSetForceRepaint(self.0, enabled) }
     }
 
@@ -105,7 +107,7 @@ impl Config {
     /// is active.
     ///
     /// (Default = 1.0 / 60.0)
-    pub fn set_animation_timer_delay(&mut self, delay: Duration){
+    pub fn set_animation_timer_delay(&mut self, delay: Duration) {
         unsafe { ulConfigSetAnimationTimerDelay(self.0, delay.as_secs_f64()) }
     }
 
@@ -113,7 +115,7 @@ impl Config {
     /// triggering another repaint.
     ///
     /// (Default is 60 Hz)
-    pub fn set_scroll_timer_delay(&mut self, delay: Duration){
+    pub fn set_scroll_timer_delay(&mut self, delay: Duration) {
         unsafe { ulConfigSetScrollTimerDelay(self.0, delay.as_secs_f64()) }
     }
 
@@ -121,21 +123,21 @@ impl Config {
     /// excess memory back to the system).
     ///
     /// (Default = 4.0)
-    pub fn set_recycle_delay(&mut self, delay: Duration){
+    pub fn set_recycle_delay(&mut self, delay: Duration) {
         unsafe { ulConfigSetRecycleDelay(self.0, delay.as_secs_f64()) }
     }
 
     /// Set the size of WebCore's memory cache for decoded images, scripts, and other assets in bytes.
     ///
     /// (Default = 64 * 1024 * 1024)
-    pub fn set_memory_cache_size(&mut self, size: u32){
+    pub fn set_memory_cache_size(&mut self, size: u32) {
         unsafe { ulConfigSetMemoryCacheSize(self.0, size) }
     }
 
     /// Set the number of pages to keep in the cache.
     ///
     /// (Default = 0)
-    pub fn set_page_cache_size(&mut self, size: u32){
+    pub fn set_page_cache_size(&mut self, size: u32) {
         unsafe { ulConfigSetPageCacheSize(self.0, size) }
     }
 
@@ -145,7 +147,7 @@ impl Config {
     /// (at the cost of some performance)
     ///
     /// (Default = 0)
-    pub fn set_override_ram_size(&mut self, size: u32){
+    pub fn set_override_ram_size(&mut self, size: u32) {
         unsafe { ulConfigSetOverrideRAMSize(self.0, size) }
     }
 
@@ -153,7 +155,7 @@ impl Config {
     /// heaps start with a smaller initial value.
     ///
     /// (Default = 32 * 1024 * 1024)
-    pub fn set_min_large_heap_size(&mut self, size: u32){
+    pub fn set_min_large_heap_size(&mut self, size: u32) {
         unsafe { ulConfigSetMinLargeHeapSize(self.0, size) }
     }
 
@@ -161,7 +163,7 @@ impl Config {
     /// heaps start with a smaller initial value.
     ///
     /// (Default = 1 * 1024 * 1024)
-    pub fn set_min_small_heap_size(&mut self, size: u32){
+    pub fn set_min_small_heap_size(&mut self, size: u32) {
         unsafe { ulConfigSetMinSmallHeapSize(self.0, size) }
     }
 
@@ -172,7 +174,7 @@ impl Config {
     /// @note If this value is 0 (the default), the number of threads will be determined at runtime
     /// using the following formula:
     ///        max(PhysicalProcessorCount() - 1, 1)
-    pub fn set_num_renderer_threads(&mut self, num_renderer_threads: u32){
+    pub fn set_num_renderer_threads(&mut self, num_renderer_threads: u32) {
         unsafe { ulConfigSetNumRendererThreads(self.0, num_renderer_threads) }
     }
 
@@ -180,7 +182,7 @@ impl Config {
     /// attempt to throttle timers and/or reschedule work if this time budget is exceeded.
     ///
     /// (Default = 0.005)
-    pub fn set_max_update_time(&mut self, max_update_time: Duration){
+    pub fn set_max_update_time(&mut self, max_update_time: Duration) {
         unsafe { ulConfigSetMaxUpdateTime(self.0, max_update_time.as_secs_f64()) }
     }
 
@@ -199,7 +201,7 @@ impl Config {
     /// cost to performance.
     ///
     /// (Default = 16)
-    pub fn set_cpu_bitmap_surface_alignment(&mut self, alignment: f64){
+    pub fn set_cpu_bitmap_surface_alignment(&mut self, alignment: f64) {
         unsafe { ulConfigSetBitmapAlignment(self.0, alignment) }
     }
 }
