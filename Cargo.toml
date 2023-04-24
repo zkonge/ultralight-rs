@@ -1,0 +1,2 @@
+[workspace]
+members = ["ultralight", "ultralight-sys"]

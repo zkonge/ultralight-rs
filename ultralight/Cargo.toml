@@ -1,0 +1,21 @@
+[package]
+name = "ultralight"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ultralight-sys = { path = "../ultralight-sys" }
+png = { version = "0.17", optional = true }
+
+[features]
+png = ["dep:png"]
+
+[[example]]
+name = "screenshot"
+required-features = ["png"]
+
+[profile.dev]
+rpath = true
+
+[profile.release]
+rpath = true
