@@ -1,5 +1,4 @@
 use std::{
-    ffi::c_int,
     fmt::{self, Debug, Formatter},
     time::Duration,
 };
@@ -13,8 +12,8 @@ pub struct Config(ULConfig);
 // SAFETY: ultralight can only run on systems, that c_int = i32.
 #[repr(i32)]
 pub enum FaceWinding {
-    Clockwise = ULFaceWinding_kFaceWinding_Clockwise as c_int,
-    CounterClockwise = ULFaceWinding_kFaceWinding_CounterClockwise as c_int,
+    Clockwise = ULFaceWinding_kFaceWinding_Clockwise as i32,
+    CounterClockwise = ULFaceWinding_kFaceWinding_CounterClockwise as i32,
 }
 
 // SAFETY: ultralight can only run on systems, that c_int = i32.
@@ -25,20 +24,20 @@ pub enum FontHinting {
     /// glyphs are slightly fuzzier but better
     /// resemble their original shape. This is achieved by snapping glyphs to the
     /// pixel grid only vertically which better preserves inter-glyph spacing.
-    Smooth = ULFontHinting_kFontHinting_Smooth as c_int,
+    Smooth = ULFontHinting_kFontHinting_Smooth as i32,
 
     /// Default hinting algorithm
     ///
     /// offers a good balance between sharpness and
     /// shape at smaller font sizes.
-    Normal = ULFontHinting_kFontHinting_Normal as c_int,
+    Normal = ULFontHinting_kFontHinting_Normal as i32,
 
     /// Strongest hinting algorithm
     ///
     /// outputs only black/white glyphs. The result
     /// is usually unpleasant if the underlying TTF does not contain hints for
     /// this type of rendering.
-    Monochrome = ULFontHinting_kFontHinting_Monochrome as c_int,
+    Monochrome = ULFontHinting_kFontHinting_Monochrome as i32,
 }
 
 impl Config {

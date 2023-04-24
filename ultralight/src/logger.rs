@@ -47,9 +47,9 @@ pub type UserLogger = fn(LogLevel, &str);
 #[derive(Debug)]
 #[repr(i32)]
 pub enum LogLevel {
-    Error = ULLogLevel_kLogLevel_Error as ULLogLevel,
-    Warning = ULLogLevel_kLogLevel_Warning as ULLogLevel,
-    Info = ULLogLevel_kLogLevel_Info as ULLogLevel,
+    Error = ULLogLevel_kLogLevel_Error as i32,
+    Warning = ULLogLevel_kLogLevel_Warning as i32,
+    Info = ULLogLevel_kLogLevel_Info as i32,
 }
 
 pub fn set_platform_logger(logger: UserLogger) {
