@@ -1,2 +1,9 @@
 [workspace]
 members = ["ultralight", "ultralight-sys"]
+
+# try not to set LD_LIBRARY_PATH ?
+[profile.dev]
+rpath = true
+
+[profile.release]
+rpath = true

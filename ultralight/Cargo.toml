@@ -13,9 +13,3 @@ png = ["dep:png"]
 [[example]]
 name = "screenshot"
 required-features = ["png"]
-
-[profile.dev]
-rpath = true
-
-[profile.release]
-rpath = true
