@@ -148,7 +148,8 @@ fn do_screenshot(
 fn main() {
     // Basic setup
     // set_platform_logger(|level, msg| println!("{level:?} {msg}"));
-    set_platform_file_system(Box::new(MyFileSystem::new("D:/ultralight".into())));
+    // equals to ulPlatformSetFileSystem
+    set_platform_file_system(Box::new(MyFileSystem::new("./".into())));
     enable_platform_font_loader();
 
     // Make configs
