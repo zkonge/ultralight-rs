@@ -1,13 +1,26 @@
-use std::rc::Rc;
+use std::{
+    rc::Rc,
+    sync::atomic::{AtomicBool, Ordering},
+};
 
 use ultralight_sys::*;
 
 use crate::{config::Config, session::Session, AsULRawPtr};
 
+static LOADED: AtomicBool = AtomicBool::new(false);
+
 pub struct Renderer(ULRenderer);
 
 impl Renderer {
     pub fn new(config: &Config) -> Rc<Self> {
+        match LOADED.compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst) {
+            Ok(x) | Err(x) => {
+                if !x {
+                    panic!("Ultralight has already been loaded. You can only load it once.")
+                }
+            }
+        }
+
         Rc::new(Renderer(unsafe { ulCreateRenderer(config.as_raw_ptr()) }))
     }
 
