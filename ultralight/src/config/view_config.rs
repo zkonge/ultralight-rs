@@ -130,7 +130,6 @@ impl AsULRawPtr<ULViewConfig> for ViewConfig {
 
 impl Drop for ViewConfig {
     fn drop(&mut self) {
-        lock_in_scope!(self.1);
         unsafe { ulDestroyViewConfig(self.0) }
     }
 }
