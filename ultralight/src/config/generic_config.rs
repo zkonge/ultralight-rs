@@ -225,7 +225,7 @@ impl Config {
     /// cost to performance.
     ///
     /// (Default = 16)
-    pub fn set_cpu_bitmap_surface_alignment(&mut self, alignment: f64) {
+    pub fn set_cpu_bitmap_surface_alignment(&mut self, alignment: u32) {
         lock_in_scope!(self.1);
         unsafe { ulConfigSetBitmapAlignment(self.0, alignment) }
     }
