@@ -78,6 +78,8 @@ impl<'a> View<'a> {
         }
     }
 
+    /// NOTICE: [`Ok`] doesn't mean no exception, return with no [`Err`] and "throw '';" is indistinguishable
+    /// with simple [`ulViewEvaluateScript`].
     pub fn evaluate_script(&mut self, script: &str) -> Result<String, String> {
         let script = UString::from(script);
         let mut exception: ULString = null_mut();
@@ -85,11 +87,13 @@ impl<'a> View<'a> {
         let result =
             unsafe { ulViewEvaluateScript(self.view, script.as_raw_ptr(), &mut exception) };
 
-        if exception.is_null() {
-            let result = ManuallyDrop::new(unsafe { UString::from_raw(result) });
+        let [result, exception] = [result, exception]
+            .map(|x| unsafe { UString::from_raw(x) })
+            .map(ManuallyDrop::new);
+
+        if exception.is_empty() {
             Ok(result.to_string())
         } else {
-            let exception = ManuallyDrop::new(unsafe { UString::from_raw(exception) });
             Err(exception.to_string())
         }
     }
