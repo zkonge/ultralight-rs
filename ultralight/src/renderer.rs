@@ -13,12 +13,8 @@ pub struct Renderer(ULRenderer);
 
 impl Renderer {
     pub fn new(config: &Config) -> Rc<Self> {
-        match LOADED.compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst) {
-            Ok(x) | Err(x) => {
-                if !x {
-                    panic!("Ultralight has already been loaded. You can only load it once.")
-                }
-            }
+        if LOADED.swap(true, Ordering::SeqCst) {
+            panic!("Ultralight has already been loaded. You can only load it once.");
         }
 
         Rc::new(Renderer(unsafe { ulCreateRenderer(config.as_raw_ptr()) }))
@@ -67,6 +63,7 @@ impl AsULRawPtr<ULRenderer> for Renderer {
 
 impl Drop for Renderer {
     fn drop(&mut self) {
+        LOADED.store(false, Ordering::SeqCst);
         unsafe { ulDestroyRenderer(self.0) }
     }
 }
